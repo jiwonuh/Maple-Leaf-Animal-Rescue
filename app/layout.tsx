@@ -2,8 +2,8 @@ import './globals.css';
 import Header from '../components/header';
 
 export const metadata = {
-  title: 'Task Manager',
-  description: 'Track your tasks with ease',
+  title: 'Maple Leaf Animal Rescue',
+  description: 'A Home Until They Find Their Own',
 };
 
 import { ReactNode } from 'react';

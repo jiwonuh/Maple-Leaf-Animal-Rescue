@@ -24,7 +24,7 @@ export default function DashboardPage() {
   return (
     <div className="mt-8 space-y-4">
       <div className="text-xl font-bold">
-        Welcome, {auth.currentUser?.email || 'User'}!
+        Welcome!
       </div>
       <button
         onClick={handleLogout}

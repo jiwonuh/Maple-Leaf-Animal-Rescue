@@ -1,26 +1,21 @@
-import Link from 'next/link';
 import './globals.css';
+import Header from '../components/header';
 
-export default function RootLayout({ children }) {
+export const metadata = {
+  title: 'Task Manager',
+  description: 'Track your tasks with ease',
+};
+
+import { ReactNode } from 'react';
+
+export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="en">
-      <body className="bg-gray-100 font-sans">
-        <header className="bg-green-700 py-4 shadow-md">
-          <nav className="max-w-7xl mx-auto flex justify-between items-center px-4">
-            <div className="space-x-6">
-              <Link href="/" className="text-white hover:text-gray-300">Home</Link>
-              <Link href="/about" className="text-white hover:text-gray-300">About</Link>
-              <Link href="/adoptions" className="text-white hover:text-gray-300">Adoptions</Link>
-              <Link href="/contact" className="text-white hover:text-gray-300">Contact</Link>
-            </div>
-          </nav>
-        </header>
-        <main className="min-h-screen max-w-7xl mx-auto px-4 py-6">
-          {children}
-        </main>
-        <footer className="bg-gray-800 text-white py-4 mt-12">
-          Footer
-        </footer>
+      <body className="bg-gray-100 text-gray-900 min-h-screen">
+        <div className="min-h-screen flex flex-col">
+          <Header /> {/* Only can see when logged in */}
+          <main className="flex-1 max-w-4xl mx-auto p-4">{children}</main>
+        </div>
       </body>
     </html>
   );

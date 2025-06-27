@@ -29,31 +29,55 @@ export default function SignupPage() {
   };
 
   return (
-    <div className="max-w-md mx-auto mt-16 bg-white p-6 rounded shadow">
-      <h1 className="text-2xl font-bold mb-4">Sign Up</h1>
-      <form onSubmit={handleSignup} className="space-y-4">
-        <input
-          type="email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          placeholder="Email"
-          className="w-full p-2 border rounded"
-        />
-        <input
-          type="password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          placeholder="Password"
-          className="w-full p-2 border rounded"
-        />
-        <button
-          type="submit"
-          className="w-full bg-green-500 text-white py-2 rounded hover:bg-green-600"
-        >
-          Sign Up
-        </button>
-        {error && <p className="text-red-500">{error}</p>}
-      </form>
+    <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-md w-full space-y-8 bg-white p-8 rounded-lg shadow-md">
+        <div className="text-center">
+          <img src="/logo.png" alt="Logo" className="mx-auto h-20 w-auto mb-2" />
+          <h2 className="mt-2 text-center text-2xl font-extrabold text-[#932421]">
+            Create an Account
+          </h2>
+        </div>
+        <form onSubmit={handleSignup} className="mt-8 space-y-6">
+          <div className="rounded-md shadow-sm -space-y-px">
+            <div>
+              <input
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="Email"
+                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-[#932421] focus:border-[#932421] focus:z-10 sm:text-sm"
+              />
+            </div>
+            <div>
+              <input
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="Password"
+                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-[#932421] focus:border-[#932421] focus:z-10 sm:text-sm"
+              />
+            </div>
+          </div>
+
+          <div>
+            <button
+              type="submit"
+              className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-[#932421] hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#932421]"
+            >
+              Sign Up
+            </button>
+          </div>
+
+          {error && <p className="text-red-500 text-sm text-center">{error}</p>}
+        </form>
+
+        <p className="text-sm text-center mt-4 text-gray-600">
+          Already have an account?{' '}
+          <a href="/login" className="text-[#932421] hover:underline">
+            Login here
+          </a>
+        </p>
+      </div>
     </div>
   );
 }

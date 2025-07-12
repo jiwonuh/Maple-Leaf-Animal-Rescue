@@ -19,18 +19,22 @@ export default NextAuth({
         if (!user) return null
         const valid = await compare(password, user.password)
         if (!valid) return null
-        return { id: user._id.toString(), email: user.email, role: user.role }
+        return { id: user._id.toString(), email: user.email, role: user.role, name: user.name }
       }
     })
   ],
   session: { strategy: 'jwt' },
   callbacks: {
     async jwt({ token, user }) {
-      if (user) token.role = user.role
+      if (user) {
+        token.role = user.role;
+        token.name = user.name;
+      }
       return token
     },
     async session({ session, token }) {
-      session.user.role = token.role
+      session.user.role = token.role;
+      session.user.name = token.name;
       return session
     }
   },

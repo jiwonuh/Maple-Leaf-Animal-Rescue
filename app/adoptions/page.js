@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { cats, dogs } from '../data/animalData';
+import { cats, dogs } from '@/data/animalData';
 
 export default function AdoptionsPage() {
   const [filter, setFilter] = useState('all');
@@ -45,23 +45,33 @@ export default function AdoptionsPage() {
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-        {filteredAnimals.map((pet) => (
-          <Link key={pet.id} href={`/adoptions/${pet.id}`} className="block border rounded-lg overflow-hidden shadow hover:shadow-md transition">
-            <Image
-              src={pet.image}
-              alt={pet.name}
-              width={400}
-              height={300}
-              className="w-full h-64 object-cover"
-            />
-            <div className="p-4">
-              <h3 className="text-xl font-semibold">{pet.name}</h3>
-              <p className="text-gray-600">{pet.breed}</p>
-              <p className="text-sm text-gray-500 mt-2">{pet.description}</p>
-            </div>
-          </Link>
-        ))}
+      {filteredAnimals.map((pet) => (
+          <div
+        key={pet.id}
+        className="flex flex-col h-full border rounded-lg overflow-hidden shadow hover:shadow-md transition"
+      >
+      <Image
+        src={pet.image}
+        alt={pet.name}
+        width={400}
+        height={300}
+        className="w-full h-64 object-cover"
+      />
+      <div className="flex flex-col justify-between flex-grow p-4">
+        <div>
+          <h3 className="text-xl font-semibold">{pet.name}</h3>
+          <p className="text-gray-600">{pet.breed}</p>
+          <p className="text-sm text-gray-500 mt-2">{pet.description}</p>
+        </div>
+        <Link href={`/adoptions/${pet.id}`}>
+          <button className="mt-4 w-full bg-[#932421] text-white py-2 rounded hover:opacity-90 transition">
+            View Details
+          </button>
+        </Link>
       </div>
+    </div>
+))}
+    </div>
     </div>
   );
 }

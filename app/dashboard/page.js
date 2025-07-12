@@ -15,7 +15,7 @@ export default function DashboardPage() {
   return (
     <div className="mt-8 space-y-4">
       <div className="text-xl font-bold">
-        Welcome{session?.user?.email ? `, ${session.user.email}` : ''}!
+        Welcome{session?.user?.name ? `, ${session.user.name}` : ''}!
       </div>
     </div>
   );

@@ -4,6 +4,7 @@ import { useRouter } from 'next/navigation'
 
 export default function SignupPage() {
   const router = useRouter()
+  const [name, setName] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
@@ -18,7 +19,7 @@ export default function SignupPage() {
       const res = await fetch('/api/user-register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify({ name, email, password }),
       })
 
       const data = await res.json()
@@ -31,7 +32,7 @@ export default function SignupPage() {
       setSuccess('Signup successful! Redirecting to login...')
       setTimeout(() => {
         router.push('/login')
-      }, 1500)
+      }, 2000)
     } catch (err) {
       console.error(err)
       setError('Something went wrong')
@@ -46,6 +47,14 @@ export default function SignupPage() {
           <p className="mt-1 text-sm text-gray-600">Create a new account</p>
         </div>
         <form onSubmit={handleSignup} className="space-y-6">
+          <input
+            type="text"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            placeholder="Name"
+            className="w-full px-3 py-2 border"
+            required
+          />
           <input
             type="email"
             value={email}

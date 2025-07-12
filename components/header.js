@@ -31,7 +31,9 @@ export default function Header() {
           <Link href="/contact" className="hover:underline">Contact</Link>
         </nav>
         <div className="flex items-center gap-4">
-          <span className="text-sm text-gray-600">{session.user.email}</span>
+          <span className="text-sm text-gray-600">  <Link href="/profile" className="hover:underline">
+          {session.user.email}
+        </Link></span>
           <button
             onClick={handleLogout}
             className="bg-[#932421] text-white text-sm px-3 py-1 rounded hover:opacity-90 transition"

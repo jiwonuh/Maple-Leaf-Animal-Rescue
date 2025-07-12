@@ -1,29 +1,22 @@
 'use client';
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { auth } from '../../lib/firebase';
-
+import { useSession } from 'next-auth/react';
 
 export default function DashboardPage() {
   const router = useRouter();
+  const { data: session, status } = useSession();
 
   useEffect(() => {
-    const unsubscribe = auth.onAuthStateChanged((user) => {
-      if (!user) {
-        router.push('/login');
-      }
-    });
-    return () => unsubscribe();
-  }, [router]);
-
-
+    if (status === 'loading') return;
+    if (!session) router.push('/login');
+  }, [session, status, router]);
 
   return (
     <div className="mt-8 space-y-4">
       <div className="text-xl font-bold">
-        Welcome!
+        Welcome{session?.user?.email ? `, ${session.user.email}` : ''}!
       </div>
-
     </div>
   );
 }

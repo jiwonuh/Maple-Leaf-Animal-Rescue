@@ -1,83 +1,73 @@
-'use client';
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
-import { createUserWithEmailAndPassword } from 'firebase/auth';
-import { doc, setDoc } from 'firebase/firestore';
-import { auth, firestore } from '../../lib/firebase';
+'use client'
+import { useState } from 'react'
+import { useRouter } from 'next/navigation'
 
 export default function SignupPage() {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
-  const router = useRouter();
+  const router = useRouter()
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+  const [error, setError] = useState('')
+  const [success, setSuccess] = useState('')
 
   const handleSignup = async (e) => {
-    e.preventDefault();
+    e.preventDefault()
+    setError('')
+    setSuccess('')
+
     try {
-      const result = await createUserWithEmailAndPassword(auth, email, password);
-      const user = result.user;
+      const res = await fetch('/api/user-register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password }),
+      })
 
-      await setDoc(doc(firestore, 'users', user.uid), {
-        role: 'user',
-        email: user.email,
-      });
+      const data = await res.json()
 
-      router.push('/login');
+      if (!res.ok) {
+        setError(data.message || 'Registration failed')
+        return
+      }
+
+      setSuccess('Signup successful! Redirecting to login...')
+      setTimeout(() => {
+        router.push('/login')
+      }, 1500)
     } catch (err) {
-      setError(err.message);
+      console.error(err)
+      setError('Something went wrong')
     }
-  };
+  }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4">
       <div className="max-w-md w-full space-y-8 bg-white p-8 rounded-lg shadow-md">
         <div className="text-center">
           <img src="/logo.png" alt="Logo" className="mx-auto h-20 w-auto mb-2" />
-          <h2 className="mt-2 text-center text-2xl font-extrabold text-[#932421]">
-            Create an Account
-          </h2>
+          <p className="mt-1 text-sm text-gray-600">Create a new account</p>
         </div>
-        <form onSubmit={handleSignup} className="mt-8 space-y-6">
-          <div className="rounded-md shadow-sm -space-y-px">
-            <div>
-              <input
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="Email"
-                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-[#932421] focus:border-[#932421] focus:z-10 sm:text-sm"
-              />
-            </div>
-            <div>
-              <input
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="Password"
-                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-[#932421] focus:border-[#932421] focus:z-10 sm:text-sm"
-              />
-            </div>
-          </div>
-
-          <div>
-            <button
-              type="submit"
-              className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-[#932421] hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#932421]"
-            >
-              Sign Up
-            </button>
-          </div>
-
-          {error && <p className="text-red-500 text-sm text-center">{error}</p>}
+        <form onSubmit={handleSignup} className="space-y-6">
+          <input
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            placeholder="Email"
+            className="w-full px-3 py-2 border"
+          />
+          <input
+            type="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            placeholder="Password"
+            className="w-full px-3 py-2 border"
+          />
+          <button type="submit" className="w-full py-2 bg-[#932421] text-white">Sign Up</button>
+          {error && <p className="text-red-500 text-center">{error}</p>}
+          {success && <p className="text-green-600 text-center">{success}</p>}
         </form>
-
-        <p className="text-sm text-center mt-4 text-gray-600">
-          Already have an account?{' '}
-          <a href="/login" className="text-[#932421] hover:underline">
-            Login here
-          </a>
+        <p className="text-sm text-center">
+          Already have an account? <a href="/login" className="text-red-700 underline">Login</a>
         </p>
       </div>
     </div>
-  );
+  )
 }

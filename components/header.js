@@ -1,23 +1,18 @@
 'use client';
-import { useEffect, useState } from 'react';
-import { auth } from '../lib/firebase';
-import Image from 'next/image';
-import { onAuthStateChanged, signOut } from 'firebase/auth';
+import { useSession, signOut } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
+import Image from 'next/image';
+import Link from 'next/link';
 
 export default function Header() {
-  const [user, setUser] = useState(null);
+  const { data: session, status } = useSession();
   const router = useRouter();
 
-  useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, setUser);
-    return () => unsubscribe();
-  }, []);
-
-  if (!user) return null;
+  if (status === 'loading') return null;
+  if (!session) return null;
 
   const handleLogout = async () => {
-    await signOut(auth);
+    await signOut({ redirect: false });
     router.push('/login');
   };
 
@@ -25,25 +20,25 @@ export default function Header() {
     <header className="bg-white shadow-md py-4 mb-6 border-b">
       <div className="max-w-5xl mx-auto flex items-center justify-between px-4">
         <div className="flex items-center gap-4">
-          <Image src="/logo.png" alt="Logo" width={200} height={40} /> {/* logo color #932421 */}
+          <Link href="/">
+            <Image src="/logo.png" alt="Logo" width={200} height={40} />
+          </Link>
         </div>
         <nav className="flex items-center gap-6 text-[#932421] font-medium">
-          <a href="/" className="hover:underline">Home</a>
-          <a href="/about" className="hover:underline">About</a>
-          <a href="/adoptions" className="hover:underline">Adoptions</a>
-          <a href="/contact" className="hover:underline">Contact</a>
+          <Link href="/" className="hover:underline">Home</Link>
+          <Link href="/about" className="hover:underline">About</Link>
+          <Link href="/adoptions" className="hover:underline">Adoptions</Link>
+          <Link href="/contact" className="hover:underline">Contact</Link>
         </nav>
-        {user && (
-          <div className="flex items-center gap-4">
-            <span className="text-sm text-gray-600">{user.email}</span>
-            <button
-              onClick={handleLogout}
-              className="bg-[#932421] text-white text-sm px-3 py-1 rounded hover:opacity-90 transition"
-            >
-              Logout
-            </button>
-          </div>
-        )}
+        <div className="flex items-center gap-4">
+          <span className="text-sm text-gray-600">{session.user.email}</span>
+          <button
+            onClick={handleLogout}
+            className="bg-[#932421] text-white text-sm px-3 py-1 rounded hover:opacity-90 transition"
+          >
+            Logout
+          </button>
+        </div>
       </div>
     </header>
   );

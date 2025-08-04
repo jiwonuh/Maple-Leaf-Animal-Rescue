@@ -2,20 +2,35 @@
 
 import { useEffect, useState } from 'react';
 import Image from 'next/image';
-import { cats, dogs } from '@/data/animalData';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 
 export default function AnimalDetailPage({ params }) {
   const { id } = params;
   const [animal, setAnimal] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const router = useRouter();
 
   useEffect(() => {
-    const allAnimals = [...cats, ...dogs];
-    const found = allAnimals.find((pet) => pet.id === id);
-    setAnimal(found);
-  }, [id]);
+    const fetchAnimal = async () => {
+      try {
+        const res = await fetch(`/api/animals/${id}`);
+        if (!res.ok) throw new Error('Animal not found');
+        const data = await res.json();
+        setAnimal(data);
+      } catch (err) {
+        console.error(err);
+        router.push('/adoptions');
+      } finally {
+        setLoading(false);
+      }
+    };
 
-  if (!animal) return <div className="text-center mt-20">Loading...</div>;
+    fetchAnimal();
+  }, [id, router]);
+
+  if (loading) return <div className="text-center mt-20">Loading...</div>;
+  if (!animal) return <div className="text-center mt-20">Animal not found</div>;
 
   return (
     <div className="max-w-5xl mx-auto px-6 py-10">
@@ -39,16 +54,16 @@ export default function AnimalDetailPage({ params }) {
               <li><strong>Status:</strong> {animal.available ? 'Available for adoption' : 'Already adopted'}</li>
             </ul>
           </div>
-            <Link href={animal.available ? `/adoptions/${animal.id}/apply` : '#'}>
+          <Link href={animal.available ? `/adoptions/${animal._id}/apply` : '#'}>
             <button
-                disabled={!animal.available}
-                className={`mt-6 w-full py-3 px-6 rounded text-white font-semibold transition ${
+              disabled={!animal.available}
+              className={`mt-6 w-full py-3 px-6 rounded text-white font-semibold transition ${
                 animal.available ? 'bg-[#932421] hover:opacity-90' : 'bg-gray-400 cursor-not-allowed'
-                }`}
+              }`}
             >
-                {animal.available ? 'Apply to Adopt' : 'Not Available'}
+              {animal.available ? 'Apply to Adopt' : 'Not Available'}
             </button>
-            </Link>
+          </Link>
         </div>
       </div>
     </div>

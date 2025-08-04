@@ -1,19 +1,22 @@
 'use client';
-
 import { useEffect, useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { useRouter, useSearchParams, useParams } from 'next/navigation';
+import { useParams, useRouter, useSearchParams } from 'next/navigation';
+import { useSession } from 'next-auth/react';
 
 export default function AnimalDetailPage() {
-  const { id } = useParams();
+  const params = useParams();
+  const id = params.id;
+  const router = useRouter();
   const searchParams = useSearchParams();
-  const isAdmin = searchParams.get('admin') === 'true';
+  const { data: session } = useSession();
 
   const [animal, setAnimal] = useState(null);
   const [loading, setLoading] = useState(true);
   const [alreadyApplied, setAlreadyApplied] = useState(false);
-  const router = useRouter();
+
+  const isAdmin = searchParams.get('admin') === 'true';
 
   useEffect(() => {
     const fetchAnimal = async () => {
@@ -22,8 +25,7 @@ export default function AnimalDetailPage() {
         if (!res.ok) throw new Error('Animal not found');
         const data = await res.json();
         setAnimal(data);
-      } catch (err) {
-        console.error(err);
+      } catch {
         router.push('/adoptions');
       } finally {
         setLoading(false);
@@ -31,13 +33,44 @@ export default function AnimalDetailPage() {
     };
 
     fetchAnimal();
+  }, [id]);
 
-    const applied = localStorage.getItem('applied_' + id) === 'true';
-    setAlreadyApplied(applied);
-  }, [id, router]);
+  useEffect(() => {
+    const checkAlreadyApplied = async () => {
+      if (!session?.user?.email) return;
+      try {
+        const res = await fetch(`/api/applications/check?animalId=${id}&userEmail=${session.user.email}`);
+        const data = await res.json();
+        setAlreadyApplied(data.exists);
+      } catch (err) {
+        console.error('Failed to check application status', err);
+      }
+    };
 
-  if (loading) return <div className="text-center mt-20">Loading...</div>;
-  if (!animal) return <div className="text-center mt-20">Animal not found</div>;
+    checkAlreadyApplied();
+  }, [id, session]);
+
+  const handleCancel = async () => {
+    if (!session?.user?.email) return;
+
+    try {
+      const res = await fetch(`/api/applications/cancel`, {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          animalId: id,
+          userEmail: session.user.email,
+        }),
+      });
+
+      if (!res.ok) throw new Error('Cancel failed');
+      setAlreadyApplied(false);
+    } catch (err) {
+      console.error('Failed to cancel adoption request', err);
+    }
+  };
+
+  if (loading || !animal) return <div className="text-center mt-20">Loading...</div>;
 
   return (
     <div className="max-w-5xl mx-auto px-6 py-10">
@@ -61,6 +94,7 @@ export default function AnimalDetailPage() {
               <li><strong>Status:</strong> {animal.available ? 'Available for adoption' : 'Already adopted'}</li>
             </ul>
           </div>
+
           {!isAdmin && (
             alreadyApplied ? (
               <div className="mt-6 text-center">
@@ -68,15 +102,10 @@ export default function AnimalDetailPage() {
                   Adoption request pending
                 </div>
                 <button
-                  onClick={() => {
-                    const confirmed = confirm(`Cancel your adoption request for ${animal.name}?`);
-                    if (!confirmed) return;
-                    localStorage.removeItem('applied_' + id);
-                    setAlreadyApplied(false);
-                  }}
-                  className="text-sm text-red-600 hover:underline"
-                >
-                  Cancel Request
+                    onClick={handleCancel}
+                    className="text-red-600 hover:underline mt-2 text-sm"
+                  >
+                    Cancel Request
                 </button>
               </div>
             ) : (

@@ -3,10 +3,12 @@
 import { useEffect, useState } from 'react';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
+import { useParams } from 'next/navigation';
 import Image from 'next/image';
 
-export default function ApplyPage({ params }) {
-  const { id } = params;
+export default function ApplyPage() {
+  const params = useParams();
+  const id = params.id;
   const router = useRouter();
   const { data: session } = useSession();
 
@@ -62,6 +64,7 @@ export default function ApplyPage({ params }) {
       });
 
       if (!res.ok) throw new Error('Submission failed');
+      localStorage.setItem('applied_' + animal._id, 'true');
 
       router.push('/thank-you');
     } catch {

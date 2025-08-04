@@ -3,17 +3,17 @@
 import { useEffect, useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { useRouter, useSearchParams } from 'next/navigation';
-import { useParams } from 'next/navigation';
+import { useRouter, useSearchParams, useParams } from 'next/navigation';
 
 export default function AnimalDetailPage() {
-  const params = useParams();
-  const id = params.id;
-  const [animal, setAnimal] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const router = useRouter();
+  const { id } = useParams();
   const searchParams = useSearchParams();
   const isAdmin = searchParams.get('admin') === 'true';
+
+  const [animal, setAnimal] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [alreadyApplied, setAlreadyApplied] = useState(false);
+  const router = useRouter();
 
   useEffect(() => {
     const fetchAnimal = async () => {
@@ -31,6 +31,9 @@ export default function AnimalDetailPage() {
     };
 
     fetchAnimal();
+
+    const applied = localStorage.getItem('applied_' + id) === 'true';
+    setAlreadyApplied(applied);
   }, [id, router]);
 
   if (loading) return <div className="text-center mt-20">Loading...</div>;
@@ -58,18 +61,36 @@ export default function AnimalDetailPage() {
               <li><strong>Status:</strong> {animal.available ? 'Available for adoption' : 'Already adopted'}</li>
             </ul>
           </div>
-
           {!isAdmin && (
-            <Link href={animal.available ? `/adoptions/${animal._id}/apply` : '#'}>
-              <button
-                disabled={!animal.available}
-                className={`mt-6 w-full py-3 px-6 rounded text-white font-semibold transition ${
-                  animal.available ? 'bg-[#932421] hover:opacity-90' : 'bg-gray-400 cursor-not-allowed'
-                }`}
-              >
-                {animal.available ? 'Apply to Adopt' : 'Not Available'}
-              </button>
-            </Link>
+            alreadyApplied ? (
+              <div className="mt-6 text-center">
+                <div className="py-3 px-6 rounded bg-yellow-100 text-yellow-800 font-semibold mb-3">
+                  Adoption request pending
+                </div>
+                <button
+                  onClick={() => {
+                    const confirmed = confirm(`Cancel your adoption request for ${animal.name}?`);
+                    if (!confirmed) return;
+                    localStorage.removeItem('applied_' + id);
+                    setAlreadyApplied(false);
+                  }}
+                  className="text-sm text-red-600 hover:underline"
+                >
+                  Cancel Request
+                </button>
+              </div>
+            ) : (
+              <Link href={`/adoptions/${animal._id}/apply`}>
+                <button
+                  disabled={!animal.available}
+                  className={`mt-6 w-full py-3 px-6 rounded text-white font-semibold transition ${
+                    animal.available ? 'bg-[#932421] hover:opacity-90' : 'bg-gray-400 cursor-not-allowed'
+                  }`}
+                >
+                  {animal.available ? 'Apply to Adopt' : 'Not Available'}
+                </button>
+              </Link>
+            )
           )}
         </div>
       </div>

@@ -15,6 +15,7 @@ export default function AdminAdoptionsPage() {
     available: true,
   });
   const [message, setMessage] = useState('');
+  const [error, setError] = useState('');
   const [animals, setAnimals] = useState([]);
   const [editingId, setEditingId] = useState(null);
 
@@ -33,44 +34,60 @@ export default function AdminAdoptionsPage() {
   };
 
   const uploadImage = async (file) => {
-  const form = new FormData();
-  form.append('image', file);
+    const form = new FormData();
+    form.append('image', file);
 
-  const res = await fetch('/api/upload', {
-    method: 'POST',
-    body: form,
-  });
+    const res = await fetch('/api/upload', {
+      method: 'POST',
+      body: form,
+    });
 
-  if (!res.ok) throw new Error('Image upload failed');
-  const data = await res.json();
-  return data.url; 
-};
-
+    if (!res.ok) throw new Error('Image upload failed');
+    const data = await res.json();
+    return data.url;
+  };
 
   const handleChange = async (e) => {
-  const { name, value, type, checked, files } = e.target;
+    const { name, value, type, checked, files } = e.target;
 
-  if (type === 'file') {
-    const file = files[0];
-    if (file) {
-      try {
-        const imageUrl = await uploadImage(file);
-        setFormData((prev) => ({ ...prev, image: imageUrl }));
-      } catch {
-        alert('Failed to upload image');
+    if (type === 'file') {
+      const file = files[0];
+      if (file) {
+        try {
+          const imageUrl = await uploadImage(file);
+          setFormData((prev) => ({ ...prev, image: imageUrl }));
+        } catch {
+          alert('Failed to upload image');
+        }
       }
+      return;
     }
-    return;
-  }
 
-  setFormData((prev) => ({
-    ...prev,
-    [name]: type === 'checkbox' ? checked : value,
-  }));
-};
+    setFormData((prev) => ({
+      ...prev,
+      [name]: type === 'checkbox' ? checked : value,
+    }));
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setError('');
+    setMessage('');
+
+    if (
+        !formData.name.trim() ||
+        !formData.breed.trim() ||
+        !formData.species.trim() ||
+        !formData.image.trim() ||
+        !formData.description.trim() ||
+        !formData.age.trim() ||
+        !formData.temperament.trim() ||
+        !formData.health.trim()
+    ) {
+        setError('All fields are required.');
+        return;
+    }
+
     const url = editingId ? `/api/animals?id=${editingId}` : '/api/animals';
     const method = editingId ? 'PUT' : 'POST';
 
@@ -87,21 +104,22 @@ export default function AdminAdoptionsPage() {
         setFormData({
           name: '',
           breed: '',
+          species: '',
           image: '',
           description: '',
           age: '',
           temperament: '',
           health: '',
-          available: true
+          available: true,
         });
         setEditingId(null);
         fetchAnimals();
       } else {
-        setMessage(data.message || 'Error saving animal.');
+        setError(data.message || 'Error saving animal.');
       }
     } catch (err) {
       console.error('Save failed:', err);
-      setMessage('Failed to save animal.');
+      setError('Failed to save animal.');
     }
   };
 
@@ -118,7 +136,7 @@ export default function AdminAdoptionsPage() {
       setMessage('Animal deleted.');
       fetchAnimals();
     } else {
-      setMessage('Failed to delete animal.');
+      setError('Failed to delete animal.');
     }
   };
 
@@ -126,6 +144,7 @@ export default function AdminAdoptionsPage() {
     <div className="max-w-4xl mx-auto px-4 py-8">
       <h1 className="text-2xl font-bold mb-4 text-[#932421]">Manage Animals</h1>
 
+      {error && <p className="mb-4 text-red-600">{error}</p>}
       {message && <p className="mb-4 text-green-600">{message}</p>}
 
       <form onSubmit={handleSubmit} className="grid grid-cols-1 gap-4 mb-8">
@@ -138,26 +157,26 @@ export default function AdminAdoptionsPage() {
           <input type="text" name="breed" value={formData.breed} onChange={handleChange} className="border px-3 py-2 w-full" />
         </label>
         <label>
-            <span className="block text-sm font-medium mb-1">Species</span>
-            <select
-                name="species"
-                value={formData.species}
-                onChange={handleChange}
-                className="border px-3 py-2 w-full"
-            >
-                <option value="">Select Species</option>
-                <option value="cat">Cat</option>
-                <option value="dog">Dog</option>
-            </select>
+          <span className="block text-sm font-medium mb-1">Species</span>
+          <select
+            name="species"
+            value={formData.species}
+            onChange={handleChange}
+            className="border px-3 py-2 w-full"
+          >
+            <option value="">Select Species</option>
+            <option value="cat">Cat</option>
+            <option value="dog">Dog</option>
+          </select>
         </label>
         <label>
           <span className="block text-sm font-medium mb-1">Description</span>
           <textarea
-              name="description"
-              value={formData.description}
-              onChange={handleChange}
-              rows={4}
-              className="border px-3 py-2 w-full resize-y"
+            name="description"
+            value={formData.description}
+            onChange={handleChange}
+            rows={4}
+            className="border px-3 py-2 w-full resize-y"
           />
         </label>
         <label>
@@ -187,12 +206,11 @@ export default function AdminAdoptionsPage() {
           </label>
           {formData.image && (
             <img
-                src={formData.image}
-                alt="Preview"
-                className="w-32 h-32 mt-2 object-cover border"
+              src={formData.image}
+              alt="Preview"
+              className="w-32 h-32 mt-2 object-cover border"
             />
-            )}
-
+          )}
         </label>
 
         <label className="flex items-center gap-2">
@@ -206,34 +224,34 @@ export default function AdminAdoptionsPage() {
       </form>
 
       <h2 className="text-xl font-semibold mb-4">Current Animals</h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
         {animals.map((a) => (
-            <div
+          <div
             key={a._id}
             className="flex flex-col border rounded-lg overflow-hidden shadow hover:shadow-md transition"
-            >
+          >
             <img
-                src={a.image}
-                alt={a.name}
-                className="w-full h-64 object-cover"
-                onError={(e) => {
+              src={a.image}
+              alt={a.name}
+              className="w-full h-64 object-cover"
+              onError={(e) => {
                 e.target.src = '/placeholder.jpg';
-                }}
+              }}
             />
             <div className="flex flex-col justify-between flex-grow p-4">
-                <div>
+              <div>
                 <h3 className="text-xl font-semibold">{a.name}</h3>
                 <p className="text-gray-600">{a.breed}</p>
                 <p className="text-sm text-gray-500 mt-2">{a.description}</p>
-                </div>
-                <div className="flex justify-between mt-4 text-sm">
+              </div>
+              <div className="flex justify-between mt-4 text-sm">
                 <button onClick={() => handleEdit(a)} className="text-blue-600 hover:underline">Edit</button>
                 <button onClick={() => handleDelete(a._id)} className="text-red-600 hover:underline">Delete</button>
-                </div>
+              </div>
             </div>
-            </div>
+          </div>
         ))}
       </div>
     </div>
-    );
+  );
 }

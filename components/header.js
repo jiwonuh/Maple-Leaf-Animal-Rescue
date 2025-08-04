@@ -26,7 +26,12 @@ export default function Header() {
         <nav className="flex items-center gap-6 text-[#932421] font-medium">
           <Link href={session?.user?.role === 'admin' ? "/admin-dashboard" : "/dashboard"} className="hover:underline">Home</Link>
           <Link href="/about" className="hover:underline">About</Link>
-          <Link href="/adoptions" className="hover:underline">Adoptions</Link>
+          <Link
+            href={session?.user?.role === 'admin' ? "/admin-dashboard/adoptions" : "/adoptions"}
+            className="hover:underline"
+          >
+            Adoptions
+          </Link>
           <Link href="/contact" className="hover:underline">Contact</Link>
         </nav>
 

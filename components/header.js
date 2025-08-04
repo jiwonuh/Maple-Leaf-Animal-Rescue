@@ -19,12 +19,12 @@ export default function Header() {
   return (
     <header className="bg-white shadow-md py-4 mb-6 border-b">
       <div className="max-w-5xl mx-auto flex items-center justify-between px-4">
-        <Link href="/">
+        <Link href={session?.user?.role === 'admin' ? "/admin-dashboard" : "/dashboard"}>
           <Image src="/logo.png" alt="Logo" width={200} height={40} />
         </Link>
 
         <nav className="flex items-center gap-6 text-[#932421] font-medium">
-          <Link href="/" className="hover:underline">Home</Link>
+          <Link href={session?.user?.role === 'admin' ? "/admin-dashboard" : "/dashboard"} className="hover:underline">Home</Link>
           <Link href="/about" className="hover:underline">About</Link>
           <Link href="/adoptions" className="hover:underline">Adoptions</Link>
           <Link href="/contact" className="hover:underline">Contact</Link>

@@ -8,19 +8,7 @@ export default function AdoptionsPage() {
   const [animals, setAnimals] = useState([]);
   const [filter, setFilter] = useState('all');
   const [loading, setLoading] = useState(true);
-  const uploadImage = async (file) => {
-  const form = new FormData();
-  form.append('image', file);
-
-  const res = await fetch('/api/upload', {
-    method: 'POST',
-    body: form,
-  });
-
-  if (!res.ok) throw new Error('Image upload failed');
-  const data = await res.json();
-  return data.url;
-};
+  
 
   useEffect(() => {
     const fetchAnimals = async () => {

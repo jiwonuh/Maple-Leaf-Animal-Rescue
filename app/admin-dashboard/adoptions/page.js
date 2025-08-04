@@ -6,6 +6,7 @@ export default function AdminAdoptionsPage() {
   const [formData, setFormData] = useState({
     name: '',
     breed: '',
+    species: '',
     image: '',
     description: '',
     age: '',
@@ -135,6 +136,19 @@ export default function AdminAdoptionsPage() {
         <label>
           <span className="block text-sm font-medium mb-1">Breed</span>
           <input type="text" name="breed" value={formData.breed} onChange={handleChange} className="border px-3 py-2 w-full" />
+        </label>
+        <label>
+            <span className="block text-sm font-medium mb-1">Species</span>
+            <select
+                name="species"
+                value={formData.species}
+                onChange={handleChange}
+                className="border px-3 py-2 w-full"
+            >
+                <option value="">Select Species</option>
+                <option value="cat">Cat</option>
+                <option value="dog">Dog</option>
+            </select>
         </label>
         <label>
           <span className="block text-sm font-medium mb-1">Description</span>

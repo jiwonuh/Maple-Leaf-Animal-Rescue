@@ -1,5 +1,6 @@
 'use client';
 import { useEffect, useState } from 'react';
+import Link from 'next/link';
 
 export default function ApplicationsPage() {
   const [applications, setApplications] = useState([]);
@@ -48,7 +49,6 @@ export default function ApplicationsPage() {
             <thead>
               <tr className="bg-gray-100">
                 <th className="px-4 py-2 border">Pet Name</th>
-                <th className="px-4 py-2 border">Breed</th>
                 <th className="px-4 py-2 border">Applicant Name</th>
                 <th className="px-4 py-2 border">Email</th>
                 <th className="px-4 py-2 border">Phone</th>
@@ -60,12 +60,16 @@ export default function ApplicationsPage() {
             <tbody>
               {applications.map((app, idx) => (
                 <tr key={app._id || idx} className="text-sm">
-                  <td className="px-4 py-2 border">{app.animalName || app.animalId}</td>
-                  <td className="px-4 py-2 border">{app.animalSpecies || '-'}</td>
+                  <td className="px-4 py-2 border"><Link href={`/adoptions/${app.animalId}?admin=true`}>
+                      {app.animalName || app.animalId}
+                    </Link>
+                  </td>
                   <td className="px-4 py-2 border">{app.name}</td>
                   <td className="px-4 py-2 border">{app.email}</td>
                   <td className="px-4 py-2 border">{app.phone}</td>
-                  <td className="px-4 py-2 border">{app.message}</td>
+                  <td className="px-4 py-2 border w-[300px] whitespace-pre-wrap break-words">
+                    {app.message}
+                  </td>
                   <td className="px-4 py-2 border text-xs text-gray-500">{new Date(app.createdAt).toLocaleString()}</td>
                   <td className="px-4 py-2 border text-center">
                     <button

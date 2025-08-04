@@ -3,13 +3,17 @@
 import { useEffect, useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { useParams } from 'next/navigation';
 
-export default function AnimalDetailPage({ params }) {
-  const { id } = params;
+export default function AnimalDetailPage() {
+  const params = useParams();
+  const id = params.id;
   const [animal, setAnimal] = useState(null);
   const [loading, setLoading] = useState(true);
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const isAdmin = searchParams.get('admin') === 'true';
 
   useEffect(() => {
     const fetchAnimal = async () => {
@@ -54,16 +58,19 @@ export default function AnimalDetailPage({ params }) {
               <li><strong>Status:</strong> {animal.available ? 'Available for adoption' : 'Already adopted'}</li>
             </ul>
           </div>
-          <Link href={animal.available ? `/adoptions/${animal._id}/apply` : '#'}>
-            <button
-              disabled={!animal.available}
-              className={`mt-6 w-full py-3 px-6 rounded text-white font-semibold transition ${
-                animal.available ? 'bg-[#932421] hover:opacity-90' : 'bg-gray-400 cursor-not-allowed'
-              }`}
-            >
-              {animal.available ? 'Apply to Adopt' : 'Not Available'}
-            </button>
-          </Link>
+
+          {!isAdmin && (
+            <Link href={animal.available ? `/adoptions/${animal._id}/apply` : '#'}>
+              <button
+                disabled={!animal.available}
+                className={`mt-6 w-full py-3 px-6 rounded text-white font-semibold transition ${
+                  animal.available ? 'bg-[#932421] hover:opacity-90' : 'bg-gray-400 cursor-not-allowed'
+                }`}
+              >
+                {animal.available ? 'Apply to Adopt' : 'Not Available'}
+              </button>
+            </Link>
+          )}
         </div>
       </div>
     </div>

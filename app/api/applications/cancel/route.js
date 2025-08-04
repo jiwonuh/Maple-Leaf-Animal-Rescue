@@ -16,7 +16,7 @@ export async function DELETE(req) {
 
     return NextResponse.json({ success: true });
   } catch (err) {
-    console.error(err);
+    console.error('Failed to cancel application:', err);
     return NextResponse.json({ error: 'Failed to cancel' }, { status: 500 });
   }
 }

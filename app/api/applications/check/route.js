@@ -20,7 +20,7 @@ export async function GET(req) {
 
     return NextResponse.json({ exists: !!existing });
   } catch (err) {
-    console.error(err);
+    console.error('Error in GET /api/applications/check:', err);
     return NextResponse.json({ exists: false }, { status: 500 });
   }
 }

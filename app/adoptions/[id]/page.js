@@ -108,6 +108,14 @@ export default function AnimalDetailPage() {
                     Cancel Request
                 </button>
               </div>
+                        ) : !session ? (
+              <Link href="/signup">
+                <button
+                  className="mt-6 w-full py-3 px-6 rounded bg-gray-500 text-white font-semibold hover:opacity-80"
+                >
+                  Sign up to Apply for Adoption
+                </button>
+              </Link>
             ) : (
               <Link href={`/adoptions/${animal._id}/apply`}>
                 <button
